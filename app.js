@@ -53,17 +53,63 @@ const promptUser = () =>{
       {
         type: 'input',
         name: 'name',
-        message: 'What is your name?'
+        message: 'What is your name?',
+        // property that accepts a boolean to check
+        // that the users answer was valid.
+        // here we are using the users input to make sure that they 
+        // entered somnething and didnt leave the field blank.
+        // if the condition evaluates to false, the user receives a message 
+        // and is prompted with the same question until an answer is received.
+        validate: nameInput =>{
+          if(nameInput){
+            return true;
+          }
+          else{
+            console.log("Please enter your name!");
+            return false;
+          }
+        }
       },
       {
         type: 'input',
         name: 'github',
-        message: 'Enter your GitHub Username'
+        message: 'Enter your GitHub Username',
+        validate: gitInput =>{
+          if(gitInput){
+            return true;
+          }
+          else{
+            console.log("Please enter your GitHub username!");
+            return false;
+          }
+        }
+      },
+      {
+        type: 'confirm',
+        name: 'confirmAbout',
+        message: 'Would you like to enter some information about yourself for an "About" section?',
+        default: true
       },
       {
         type: 'input',
         name: 'about',
-        message: 'Provide some information about yourself:'
+        message: 'Provide some information about yourself:',
+        // Next we'll add another property to the prompt looking for 
+        // information about the user called when. This is like the validate 
+        // method we used previously, but instead of passing the value entered 
+        // for that specific question in as the parameter, it passes an object 
+        // of all of the answers given so far as an object.
+        // the when property returns an object that lists the current answers
+        // as properties, here we are accessing the confirmAbout property
+        // in that object and seeing if it is true.
+        when: ({ confirmAbout }) => {
+          if (confirmAbout) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      
       }
     ]);
     
@@ -95,12 +141,30 @@ Add a New Project
     {
       type: 'input',
       name: 'name',
-      message: 'What is the name of your project?'
+      message: 'What is the name of your project?',
+      validate: nameInput =>{
+        if(nameInput){
+          return true;
+        }
+        else{
+          console.log("Please enter your project name!");
+          return false;
+        }
+      }
     },
     {
       type: 'input',
       name: 'description',
-      message: 'Provide a description of the project (Required)'
+      message: 'Provide a description of the project.',
+      validate: descInput =>{
+        if(descInput){
+          return true;
+        }
+        else{
+          console.log("Please enter your project description!");
+          return false;
+        }
+      }
     },
     // The checkbox type was used to give the user options a 
     // list of answers to choose that allows none or all selections as valid entries.
@@ -116,7 +180,16 @@ Add a New Project
     {
       type: 'input',
       name: 'link',
-      message: 'Enter the GitHub link to your project. (Required)'
+      message: 'Enter the GitHub link to your project.',
+      validate: linkInput =>{
+        if(linkInput){
+          return true;
+        }
+        else{
+          console.log("Please enter your project's link!");
+          return false;
+        }
+      }
     },
     {
       type: 'confirm',
