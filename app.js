@@ -21,13 +21,15 @@ const inquirer = require('inquirer');
 // system. A module can be a function, a class, an object, or simple variables. 
 // Whatever its form, a module is a reusable piece of code that can be imported 
 // to anywhere it's needed. 
-// const fs = require("fs");
+const fs = require("fs");
 
 //  because we added the module.exports statement at the end of the 
-// page-template.js file (with module.exports set to our generatePage() 
-// function), we can now use the require statement to include generatePage() 
-// at the top of the app.js file.
-// const generatePage = require('./src/page-template.js');
+// page-template.js file (with module.exports set to our 
+// function from the file), we can now use the require statement to include 
+// generatePage() in this app.js file.
+// This expression assigns the anonymous HTML template function 
+// in page-template.js to the variable generatePage.
+const generatePage = require('./src/page-template.js');
 
 
 const promptUser = () =>{
@@ -127,6 +129,7 @@ const promptProject = portfolioData => {
   // erase all the project data we collected. We want this expression to 
   // occur on the first pass only.
   // so we check to make sure it doesnt already exist
+  console.log("DATAAAAA " + portfolioData);
   if(!portfolioData.projects){
     portfolioData.projects = [];
   }
@@ -223,7 +226,9 @@ Add a New Project
 // We'll explore Promises more 
 // later, but for now understand that this is a new tool for dealing with 
 // asynchronous functions that will return the answer object in the "then" function. 
-promptUser().then(answers => console.log(answers))
+// this first line gets the answers from user regarding their name
+// and things like that.
+promptUser()
 // Using Promises, we can chain the functions together using 
 // the then() method, as shown here:
 // The preceding image shows that by chaining the function 
@@ -231,7 +236,19 @@ promptUser().then(answers => console.log(answers))
 // application's control flow. We only want to prompt users with the 
 // project questions after the profile questions since they are naturally
 // asynch.
-.then(() =>{return promptProject([]);}).then(portfolioProjects => console.log(portfolioProjects));
+// this function prompts the user about any projects they would like to add
+// and then catches the answers which are then used in the second "then"
+// below this one
+.then(promptProject)
+.then(portfolioProjects => {
+    const pageHTML = generatePage(portfolioProjects);
+
+    fs.writeFile('./index.html', pageHTML, err => {
+      if (err) throw new Error(err);
+
+      console.log('Page created! Check out index.html in this directory to see it!');
+    });   
+});
 
 
 // assignment destructuring, is the same as these two
