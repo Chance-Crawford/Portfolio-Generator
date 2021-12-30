@@ -21,7 +21,13 @@ const inquirer = require('inquirer');
 // system. A module can be a function, a class, an object, or simple variables. 
 // Whatever its form, a module is a reusable piece of code that can be imported 
 // to anywhere it's needed. 
-const fs = require("fs");
+// const fs = require("fs");
+
+// replaced with the writefile and copyfile we made in generate-site.js
+// which returns a promise and handles all the writing and copying
+// the 2 functions in the module object were destructured to variables
+// so we can use them like writeFile() and dont need dot notation.
+const { writeFile, copyFile } = require('./utils/generate-site.js');
 
 //  because we added the module.exports statement at the end of the 
 // page-template.js file (with module.exports set to our 
@@ -239,15 +245,47 @@ promptUser()
 // this function prompts the user about any projects they would like to add
 // and then catches the answers which are then used in the second "then"
 // below this one
+// The promptProject() function captures the returning data from promptUser() above.
 .then(promptProject)
-.then(portfolioProjects => {
-    const pageHTML = generatePage(portfolioProjects);
-
-    fs.writeFile('./index.html', pageHTML, err => {
-      if (err) throw new Error(err);
-
-      console.log('Page created! Check out index.html in this directory to see it!');
-    });   
+// after prompting the project, take the data
+// from user and generate the page.
+// the final set of data from promptUser and promptProject
+// are passed here. 
+// The finished portfolio data object is returned as 
+// portfolioData and sent into the generatePage() function, which will 
+// return the finished HTML template code into pageHTML below.
+.then(portfolioData => {
+  return generatePage(portfolioData);
+})
+// We pass pageHTML into the newly created writeFile() function, which returns 
+// a Promise. This is why we use return here, so the Promise is returned into the 
+// next .then() method.
+.then(pageHTML => {
+  // our own custom function writeFile that returns a promise.
+  // write file is from utils/generate-site.js.
+  // writes the data returned by generate page to
+  // a new generated html page
+  return writeFile(pageHTML);
+})
+// Upon a successful file creation, we take the writeFileResponse object 
+// provided by the writeFile() function's resolve() execution to log it, and 
+// then we return copyFile().
+.then(writeFileResponse => {
+  console.log(writeFileResponse);
+  return copyFile();
+})
+// The Promise returned by copyFile() then lets us know if the CSS file 
+// was copied correctly, and if so, we're all done!
+.then(copyFileResponse => {
+  console.log(copyFileResponse);
+})
+// this is a promise chain, all promises based functions return and then pass the data
+// to the next function. This forces them to go one at a time.
+// We only need to write one .catch() method to handle any error that may occur 
+// with any of the Promise-based functions If we need to execute a Promise's 
+// reject() function, it'll just jump right to the .catch() method.
+.catch(err => {
+  console.log(err);
 });
 
 
